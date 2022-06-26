@@ -1,26 +1,85 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import Category from 'src/entities/category.entity';
+import Product from 'src/entities/product.entity';
+import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+  @InjectRepository(Product)
+  private readonly repository: Repository<Product>;
+
+  @InjectRepository(Category)
+  private readonly categoryRepository: Repository<Category>;
+
+  async create(createProductDto: CreateProductDto) {
+    const category = await this.categoryRepository.findOneBy({
+      id: createProductDto.categoryId,
+    });
+
+    const product: Product = new Product();
+    product.name = createProductDto.name;
+    product.soldAmount = createProductDto.soldAmount;
+    product.price = createProductDto.price;
+    product.description = createProductDto.description;
+    product.extraInformation = createProductDto.extraInformation;
+    product.imgUrl = createProductDto.imgUrl;
+    product.category = category;
+
+    return await this.repository.save(product);
   }
 
-  findAll() {
-    return `This action returns all product`;
+  async findAll() {
+    return await this.repository.find({
+      relations: {
+        category: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: number) {
+    return await this.repository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        category: true,
+      },
+    });
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: number, updateProductDto: CreateProductDto) {
+    const category = await this.categoryRepository.findOneBy({
+      id: updateProductDto.categoryId,
+    });
+
+    const result = await this.repository
+      .createQueryBuilder()
+      .update({
+        name: updateProductDto.name,
+        soldAmount: updateProductDto.soldAmount,
+        price: updateProductDto.price,
+        description: updateProductDto.description,
+        extraInformation: updateProductDto.extraInformation,
+        imgUrl: updateProductDto.imgUrl,
+        category: category,
+      })
+      .where({ id })
+      .returning('*')
+      .execute();
+
+    return result.raw[0];
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: number) {
+    const result = await this.repository
+      .createQueryBuilder()
+      .delete()
+      .where({ id })
+      .returning('*')
+      .execute();
+
+    return result.raw[0];
   }
 }

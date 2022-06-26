@@ -16,11 +16,15 @@ class UserProduct {
   @Column()
   public ProductCount: number;
 
-  @OneToOne(() => Product)
+  @OneToOne(() => Product, {
+    cascade: true,
+  })
   @JoinColumn()
   public product: Product;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, {
+    cascade: true,
+  })
   @JoinColumn()
   public user: User;
 }

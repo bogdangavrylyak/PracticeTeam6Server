@@ -24,7 +24,9 @@ class Product {
   @Column()
   public imgUrl: string;
 
-  @ManyToOne(() => Category, (category: Category) => category.products)
+  @ManyToOne(() => Category, (category: Category) => category.products, {
+    cascade: true,
+  })
   public category: Category;
 }
 
