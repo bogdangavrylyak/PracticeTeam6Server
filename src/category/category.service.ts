@@ -22,25 +22,27 @@ export class CategoryService {
   }
 
   async findOne(id: number) {
-    return await this.repository.findOneBy({ id })
+    return await this.repository.findOneBy({ id });
   }
 
   async update(id: number, updateCategoryDto: CreateCategoryDto) {
-    const result = await this.repository.createQueryBuilder()
-    .update(updateCategoryDto)
-    .where({ id })
-    .returning('*')
-    .execute();
+    const result = await this.repository
+      .createQueryBuilder()
+      .update(updateCategoryDto)
+      .where({ id })
+      .returning('*')
+      .execute();
 
     return result.raw[0];
   }
 
   async remove(id: number) {
-    const result = await this.repository.createQueryBuilder()
-    .delete()
-    .where({ id })
-    .returning('*')
-    .execute();
+    const result = await this.repository
+      .createQueryBuilder()
+      .delete()
+      .where({ id })
+      .returning('*')
+      .execute();
 
     return result.raw[0];
   }

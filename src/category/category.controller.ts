@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -24,7 +32,10 @@ export class CategoryController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateCategoryDto: CreateCategoryDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateCategoryDto: CreateCategoryDto,
+  ) {
     return await this.categoryService.update(+id, updateCategoryDto);
   }
 

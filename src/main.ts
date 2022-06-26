@@ -10,8 +10,8 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   const config = new DocumentBuilder()
-    .setTitle('Course Work')
-    .setDescription('Built with NestJS and Prisma')
+    .setTitle('Practice Team6 Server')
+    .setDescription('Built with NestJS and TypeORM')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);

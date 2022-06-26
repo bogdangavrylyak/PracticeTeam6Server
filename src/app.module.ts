@@ -7,14 +7,12 @@ import { ProductModule } from './product/product.module';
 import { TypeOrmConfigService } from './typeorm/typeorm.service';
 import { CategoryModule } from './category/category.module';
 
-// const envFilePath: string = 
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService}),
+    TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
     ProductModule,
-    CategoryModule
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
