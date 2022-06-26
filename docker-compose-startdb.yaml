@@ -1,0 +1,13 @@
+version: '3'
+services:
+  db:
+    container_name: team6_db
+    image: postgres:13.4-alpine
+    volumes:
+      - /var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: team6_db
+    ports:
+      - '5432:5432'
