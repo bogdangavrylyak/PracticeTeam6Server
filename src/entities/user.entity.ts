@@ -11,11 +11,19 @@ class User {
   @Column()
   public LastName: string;
 
-  @Column()
+  @Column({
+    unique: true,
+  })
   public Email: string;
 
   @Column()
   public Password: string;
+
+  @Column({
+    unique: true,
+    nullable: true,
+  })
+  public refreshToken!: string | null;
 
   @Column()
   public CartTotalPrice: number;
