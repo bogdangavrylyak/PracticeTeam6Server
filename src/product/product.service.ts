@@ -25,7 +25,7 @@ export class ProductService {
       .createQueryBuilder('product')
       .leftJoin('product.category', 'category')
       .select(
-        'product.id AS id, product.name AS name, "soldAmount", price, description, "extraInformation", product."imgUrl" AS "imgUrl", quantity',
+        'product.id AS id, product.name AS name, "soldAmount", price, product."imgUrl" AS "imgUrl", quantity',
       )
       .addSelect('category.name', 'categoryName')
       .skip(skip)
