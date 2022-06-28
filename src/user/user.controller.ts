@@ -13,7 +13,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtTokenDto } from './dto/jwt-token.dto';
 import { RefreshDto } from './dto/refresh.dto';
-import { Firewall } from './decorators/firewall.decorator';
 import { LoginDto } from './dto/login.dto';
 
 @Controller('user')
@@ -32,9 +31,6 @@ export class UserController {
     return await this.userService.logIn(body);
   }
 
-  @Firewall({
-    anonymous: true, // just to disable JwtAuthGuard
-  })
   @Post('refresh')
   @ApiResponse({ type: JwtTokenDto })
   async refresh(@Body() body: RefreshDto) {
