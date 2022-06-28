@@ -28,6 +28,11 @@ class Product {
     cascade: true,
   })
   public category: Category;
+
+  @Column({
+    nullable: true,
+  })
+  public quantity!: number;
 }
 
 export default Product;

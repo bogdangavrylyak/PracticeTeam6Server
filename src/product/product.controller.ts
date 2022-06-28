@@ -12,11 +12,20 @@ import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
+import { User } from 'src/user/decorators/user.decorator';
+import { UserDto } from 'src/user/dto/user.dto';
+import { OptionalAuthGuard } from 'src/user/guards/optional-auth.guard';
 
 @Controller('product')
 @ApiTags('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
+
+  @UseGuards(OptionalAuthGuard)
+  @Get('home')
+  async home(@User() user: UserDto) {
+    return await this.productService.home(user ? user?.id : null);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post()

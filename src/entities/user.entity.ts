@@ -28,6 +28,11 @@ class User {
   @Column()
   public CartTotalPrice: number;
 
+  @Column({
+    nullable: true,
+  })
+  public CartTotalAmount!: number;
+
   // @OneToOne(() => UserProduct)
   // @JoinColumn()
   // public products: UserProduct;

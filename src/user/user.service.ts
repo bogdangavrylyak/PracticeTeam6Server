@@ -107,8 +107,6 @@ export class UserService {
         ),
       };
     } catch (error) {
-      console.log('error: ', error);
-      console.log('error.Error: ', error.message);
       if (
         error.message === 'Password is not matching' ||
         error instanceof UnprocessableEntityException
@@ -231,6 +229,7 @@ export class UserService {
     user.Email = createUserDto.email;
     user.Password = createUserDto.password;
     user.CartTotalPrice = 0;
+    user.CartTotalAmount = 0;
 
     return await this.repository.save(user);
   }
@@ -243,10 +242,6 @@ export class UserService {
     return await this.repository.save(user);
   }
 
-  async findAll() {
-    return `This action returns all user`;
-  }
-
   async findOne(id: number) {
     return await this.repository.findOne({
       where: {
@@ -254,6 +249,10 @@ export class UserService {
       },
     });
   }
+
+  // async findAll() {
+  //   return `This action returns all user`;
+  // }
 
   // async update(id: number, updateUserDto: CreateUserDto) {
   //   return `This action updates a #${id} user`;

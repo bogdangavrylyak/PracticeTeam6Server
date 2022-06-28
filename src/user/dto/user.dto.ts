@@ -12,4 +12,6 @@ export class UserDto {
   refreshToken!: string | null;
 
   CartTotalPrice: number;
+
+  CartTotalAmount: number;
 }
