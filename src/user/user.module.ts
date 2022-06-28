@@ -7,13 +7,15 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import Product from 'src/entities/product.entity';
+import UserProduct from 'src/entities/user-product.entity';
 
 const access_token_expires_in_days = 1;
 
 @Module({
   imports: [
     PassportModule,
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Product, UserProduct]),
     JwtModule.registerAsync({
       imports: [ConfigService],
       inject: [ConfigService],

@@ -19,6 +19,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { JwtTokenDto } from './dto/jwt-token.dto';
 import { JwtPayloadDto } from './dto/jwt-payload.dto';
 import { LoginDto } from './dto/login.dto';
+import UserProduct from 'src/entities/user-product.entity';
+import Product from 'src/entities/product.entity';
 
 const saltRounds = 10;
 
@@ -33,6 +35,12 @@ export class UserService {
 
   @InjectRepository(User)
   private readonly repository: Repository<User>;
+
+  @InjectRepository(Product)
+  private readonly repositoryProduct: Repository<Product>;
+
+  @InjectRepository(UserProduct)
+  private readonly repositoryUserProduct: Repository<UserProduct>;
 
   @Inject(ConfigService)
   private readonly config: ConfigService;
@@ -250,15 +258,127 @@ export class UserService {
     });
   }
 
+  async getCart(userId: number) {
+    const userProduct = await this.repositoryUserProduct
+      .createQueryBuilder('userProduct')
+      .innerJoin('userProduct.product', 'product')
+      .innerJoin('product.category', 'category')
+      .select(
+        'product.id AS id, product.name AS name, "soldAmount" AS sold, price, product."imgUrl" AS "image", quantity',
+      )
+      .addSelect('category.name', 'category')
+      .where('"userId" = :id', { id: userId })
+      .getRawMany();
+
+    return userProduct;
+  }
+
+  async cartAdd(userId: number, productId: number) {
+    const product = await this.repositoryProduct.findOne({
+      where: {
+        id: productId,
+      },
+    });
+
+    const user = await this.findOne(userId);
+
+    const userProduct = new UserProduct();
+    userProduct.user = user;
+    userProduct.product = product;
+    userProduct.ProductCount = userProduct.ProductCount
+      ? userProduct.ProductCount++
+      : 1;
+
+    user.CartTotalAmount = user.CartTotalAmount ? user.CartTotalAmount++ : 1;
+
+    user.CartTotalPrice = user.CartTotalPrice
+      ? user.CartTotalPrice++
+      : product.price;
+
+    product.quantity = product.quantity ? product.quantity++ : 1;
+
+    await this.repositoryProduct.save(product);
+
+    await this.repository.save(user);
+
+    return await this.repositoryUserProduct.save(userProduct);
+  }
+
+  async cartProductCount(userId: number, productId: number, sign: string) {
+    const product = await this.repositoryProduct.findOne({
+      where: {
+        id: productId,
+      },
+    });
+
+    const user = await this.findOne(userId);
+
+    const userProduct = await this.repositoryUserProduct.findOne({
+      where: {
+        user: user,
+        product: product,
+      },
+    });
+
+    if (sign === '+') {
+      console.log('true');
+
+      userProduct.ProductCount += 1;
+      user.CartTotalAmount += 1;
+      user.CartTotalPrice += product.price;
+      product.quantity += 1;
+    } else if (sign === '-') {
+      console.log('false');
+      userProduct.ProductCount -= 1;
+      user.CartTotalAmount -= 1;
+      user.CartTotalPrice -= product.price;
+      product.quantity -= 1;
+    }
+
+    await this.repositoryProduct.save(product);
+
+    await this.repository.save(user);
+
+    return await this.repositoryUserProduct.save(userProduct);
+  }
+
+  async cartProductDelete(userId: number, productId: number) {
+    const product = await this.repositoryProduct.findOne({
+      where: {
+        id: productId,
+      },
+    });
+
+    const user = await this.findOne(userId);
+
+    const userProduct = await this.repositoryUserProduct
+      .createQueryBuilder('userProduct')
+      .where('"userId" = :uid', { uid: userId })
+      .andWhere('"productId" = :id', { id: productId })
+      .getOne();
+
+    const deleteUserProduct = await this.repositoryUserProduct.delete({
+      id: userProduct.id,
+    });
+
+    console.log('userProduct.raw[0]: ', deleteUserProduct);
+
+    user.CartTotalAmount -= userProduct.ProductCount;
+
+    user.CartTotalPrice -= userProduct.ProductCount * product.price;
+
+    product.quantity = 0;
+
+    await this.repositoryProduct.save(product);
+
+    await this.repository.save(user);
+
+    return {
+      userProduct,
+    };
+  }
+
   // async findAll() {
   //   return `This action returns all user`;
-  // }
-
-  // async update(id: number, updateUserDto: CreateUserDto) {
-  //   return `This action updates a #${id} user`;
-  // }
-
-  // async remove(id: number) {
-  //   return `This action removes a #${id} user`;
   // }
 }

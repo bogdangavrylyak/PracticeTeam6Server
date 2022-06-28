@@ -8,6 +8,7 @@ import {
   Delete,
   Logger,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,6 +19,8 @@ import { LoginDto } from './dto/login.dto';
 import { User } from './decorators/user.decorator';
 import { UserDto } from './dto/user.dto';
 import { JwtAuthGuard } from './guards/jwt.guard';
+import { CartProductCount } from './dto/cart-product-count.dto';
+import { AddCartDto } from './dto/add-cart.dto';
 
 @Controller('user')
 @ApiTags('user')
@@ -51,23 +54,53 @@ export class UserController {
     return this.userService.authUserInfo(user.id);
   }
 
-  // @Get()
-  // async findAll() {
-  //   return this.userService.findAll();
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Get('get-cart')
+  async getCart(@User() user: UserDto) {
+    this.l.log('--- get-cart ---');
 
-  // @Get(':id')
-  // async findOne(@Param('id') id: string) {
-  //   return this.userService.findOne(+id);
-  // }
+    return this.userService.getCart(user.id);
+  }
 
-  // @Patch(':id')
-  // async update(@Param('id') id: string, @Body() updateUserDto: CreateUserDto) {
-  //   return this.userService.update(+id, updateUserDto);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Post('cart-add')
+  async cartAdd(@User() user: UserDto, @Body() addCartDto: AddCartDto) {
+    this.l.log('--- cart-add ---');
 
-  // @Delete(':id')
-  // async remove(@Param('id') id: string) {
-  //   return this.userService.remove(+id);
-  // }
+    return this.userService.cartAdd(user.id, addCartDto.productId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('cart-product-count')
+  async cartProductCount(
+    @User() user: UserDto,
+    @Body() body: CartProductCount,
+  ) {
+    this.l.log('--- auth ---');
+
+    return this.userService.cartProductCount(
+      user.id,
+      body.productId,
+      body.sign,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('cart-product-delete')
+  async cartProductDelete(
+    @User() user: UserDto,
+    @Query('productId') productId: number,
+  ) {
+    this.l.log('--- auth ---');
+
+    return this.userService.cartProductDelete(user.id, productId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('checkout')
+  async checkout(@User() user: UserDto) {
+    this.l.log('--- auth ---');
+
+    return this.userService.authUserInfo(user.id);
+  }
 }

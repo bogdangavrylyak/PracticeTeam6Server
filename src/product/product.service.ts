@@ -19,8 +19,6 @@ export class ProductService {
   private readonly userRepository: Repository<User>;
 
   async home(paginationData: PaginationData, userId: number | null) {
-    const take = paginationData.limit || 10;
-    const skip = paginationData.offset || 0;
     const products = await this.repository
       .createQueryBuilder('product')
       .innerJoin('product.category', 'category')
@@ -28,8 +26,8 @@ export class ProductService {
         'product.id AS id, product.name AS name, "soldAmount", price, product."imgUrl" AS "imgUrl", quantity',
       )
       .addSelect('category.name', 'categoryName')
-      .limit(take)
-      .offset(skip)
+      .limit(paginationData.limit || 10)
+      .offset(paginationData.offset || 0)
       .getRawMany();
     const categories = await this.categoryRepository.find();
 
