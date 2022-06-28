@@ -40,10 +40,10 @@ export class UserService {
   public async signUp(signUpData: CreateUserDto) {
     try {
       const salt = await bcrypt.genSalt(saltRounds);
-      const hashedPassword = await bcrypt.hash(signUpData.Password, salt);
+      const hashedPassword = await bcrypt.hash(signUpData.password, salt);
       const createdUser = await this.create({
         ...signUpData,
-        Password: hashedPassword,
+        password: hashedPassword,
       });
 
       return {
@@ -176,10 +176,10 @@ export class UserService {
 
   private async create(createUserDto: CreateUserDto) {
     const user: User = new User();
-    user.FirstName = createUserDto.FirstName;
-    user.LastName = createUserDto.LastName;
-    user.Email = createUserDto.Email;
-    user.Password = createUserDto.Password;
+    user.FirstName = createUserDto.firstName;
+    user.LastName = createUserDto.lastName;
+    user.Email = createUserDto.email;
+    user.Password = createUserDto.password;
     user.CartTotalPrice = 0;
 
     return await this.repository.save(user);
