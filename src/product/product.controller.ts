@@ -15,6 +15,7 @@ import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 import { User } from 'src/user/decorators/user.decorator';
 import { UserDto } from 'src/user/dto/user.dto';
 import { OptionalAuthGuard } from 'src/user/guards/optional-auth.guard';
+import { PaginationData } from './dto/pagination.dto';
 
 @Controller('product')
 @ApiTags('product')
@@ -22,9 +23,12 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @UseGuards(OptionalAuthGuard)
-  @Get('home')
-  async home(@User() user: UserDto) {
-    return await this.productService.home(user ? user?.id : null);
+  @Post('home')
+  async home(@User() user: UserDto, @Body() paginationData: PaginationData) {
+    return await this.productService.home(
+      paginationData,
+      user ? user?.id : null,
+    );
   }
 
   @UseGuards(JwtAuthGuard)

@@ -5,6 +5,7 @@ import Product from 'src/entities/product.entity';
 import User from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
+import { PaginationData } from './dto/pagination.dto';
 
 @Injectable()
 export class ProductService {
@@ -17,8 +18,19 @@ export class ProductService {
   @InjectRepository(User)
   private readonly userRepository: Repository<User>;
 
-  async home(userId: number | null) {
-    const products = await this.repository.find();
+  async home(paginationData: PaginationData, userId: number | null) {
+    const take = paginationData.limit || 10;
+    const skip = paginationData.offset || 0;
+    const products = await this.repository
+      .createQueryBuilder('product')
+      .leftJoin('product.category', 'category')
+      .select(
+        'product.id AS id, product.name AS name, "soldAmount", price, description, "extraInformation", product."imgUrl" AS "imgUrl", quantity',
+      )
+      .addSelect('category.name', 'categoryName')
+      .skip(skip)
+      .take(take)
+      .getRawMany();
     const categories = await this.categoryRepository.find();
 
     let userCartTotalAmount: number | null = 0;
