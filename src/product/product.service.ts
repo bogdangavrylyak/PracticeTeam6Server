@@ -23,13 +23,13 @@ export class ProductService {
     const skip = paginationData.offset || 0;
     const products = await this.repository
       .createQueryBuilder('product')
-      .leftJoin('product.category', 'category')
+      .innerJoin('product.category', 'category')
       .select(
         'product.id AS id, product.name AS name, "soldAmount", price, product."imgUrl" AS "imgUrl", quantity',
       )
       .addSelect('category.name', 'categoryName')
-      .skip(skip)
-      .take(take)
+      .limit(take)
+      .offset(skip)
       .getRawMany();
     const categories = await this.categoryRepository.find();
 
