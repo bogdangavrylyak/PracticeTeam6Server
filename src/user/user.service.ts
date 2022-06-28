@@ -154,7 +154,7 @@ export class UserService {
   }
 
   public async authUserInfo(userId: number) {
-    return await this.repository.findOne({
+    const dbUser = await this.repository.findOne({
       where: {
         id: userId,
       },
@@ -164,6 +164,11 @@ export class UserService {
         LastName: true,
       },
     });
+
+    return {
+      email: dbUser.Email,
+      fullName: dbUser.FirstName + ' ' + dbUser.LastName,
+    };
   }
 
   public async validateJwtUser(payload: JwtPayloadDto): Promise<User | null> {
