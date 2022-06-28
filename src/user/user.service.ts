@@ -47,8 +47,16 @@ export class UserService {
       });
 
       return {
-        accessToken: await this.generateAccessToken(createdUser.id),
-        refreshToken: await this.generateRefreshToken(createdUser.id),
+        accessToken: await this.generateAccessToken(
+          createdUser.id,
+          createdUser.Email,
+          createdUser.FirstName + ' ' + createdUser.LastName,
+        ),
+        refreshToken: await this.generateRefreshToken(
+          createdUser.id,
+          createdUser.Email,
+          createdUser.FirstName + ' ' + createdUser.LastName,
+        ),
       };
     } catch (error) {
       if (error?.driverError.code === PostgresErrorCode.UniqueViolation) {
@@ -87,8 +95,16 @@ export class UserService {
       }
 
       return {
-        accessToken: await this.generateAccessToken(user.id),
-        refreshToken: await this.generateRefreshToken(user.id),
+        accessToken: await this.generateAccessToken(
+          user.id,
+          user.Email,
+          user.FirstName + ' ' + user.LastName,
+        ),
+        refreshToken: await this.generateRefreshToken(
+          user.id,
+          user.Email,
+          user.FirstName + ' ' + user.LastName,
+        ),
       };
     } catch (error) {
       console.log('error: ', error);
@@ -123,7 +139,11 @@ export class UserService {
         throw new BadRequestException('Incorrect refresh token');
       }
 
-      return this.generateAccessToken(user.id);
+      return this.generateAccessToken(
+        user.id,
+        user.Email,
+        user.FirstName + ' ' + user.LastName,
+      );
     } catch (e) {
       if (e instanceof TokenExpiredError) {
         throw new UnprocessableEntityException('Refresh token expired');
@@ -133,22 +153,47 @@ export class UserService {
     }
   }
 
+  public async authUserInfo(userId: number) {
+    return await this.repository.findOne({
+      where: {
+        id: userId,
+      },
+      select: {
+        Email: true,
+        FirstName: true,
+        LastName: true,
+      },
+    });
+  }
+
   public async validateJwtUser(payload: JwtPayloadDto): Promise<User | null> {
     return this.findOne(payload.sub);
   }
 
-  private async generateAccessToken(userId: number): Promise<JwtTokenDto> {
+  private async generateAccessToken(
+    userId: number,
+    email: string,
+    fullName: string,
+  ): Promise<JwtTokenDto> {
     const payload: JwtPayloadDto = {
       sub: userId,
+      fullName,
+      email,
     };
 
     const response = await this.generateToken(payload, access_token_expires_in);
     return response;
   }
 
-  public async generateRefreshToken(userId: number): Promise<JwtTokenDto> {
+  public async generateRefreshToken(
+    userId: number,
+    email: string,
+    fullName: string,
+  ): Promise<JwtTokenDto> {
     const payload: JwtPayloadDto = {
       sub: userId,
+      fullName,
+      email,
     };
 
     const response = await this.generateToken(

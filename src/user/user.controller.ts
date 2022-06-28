@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Logger,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -14,6 +15,9 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtTokenDto } from './dto/jwt-token.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { LoginDto } from './dto/login.dto';
+import { User } from './decorators/user.decorator';
+import { UserDto } from './dto/user.dto';
+import { JwtAuthGuard } from './guards/jwt.guard';
 
 @Controller('user')
 @ApiTags('user')
@@ -37,6 +41,14 @@ export class UserController {
     this.l.log('--- refresh ---');
 
     return this.userService.refreshAccessToken(body.refreshToken);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('auth')
+  async auth(@User() user: UserDto) {
+    this.l.log('--- auth ---');
+
+    return this.userService.authUserInfo(user.id);
   }
 
   // @Get()

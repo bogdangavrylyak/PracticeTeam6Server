@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/user/decorators/user.decorator';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { UserDto } from 'src/user/dto/user.dto';
 import { JwtAuthGuard } from 'src/user/guards/jwt.guard';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -23,7 +23,7 @@ export class CategoryController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(
-    @User() user: CreateUserDto,
+    @User() user: UserDto,
     @Body() createCategoryDto: CreateCategoryDto,
   ) {
     console.log('user: ', user);
