@@ -270,7 +270,9 @@ export class UserService {
       .where('"userId" = :id', { id: userId })
       .getRawMany();
 
-    return userProduct;
+    return {
+      products: userProduct,
+    };
   }
 
   async cartAdd(userId: number, productId: number) {
