@@ -264,9 +264,9 @@ export class UserService {
       .innerJoin('userProduct.product', 'product')
       .innerJoin('product.category', 'category')
       .select(
-        'product.id AS id, product.name AS name, "soldAmount" AS sold, price, product."imgUrl" AS "image", quantity',
+        'product.id AS id, product.name AS name, "soldAmount" AS sold, price, product."imgUrl" AS "imgUrl", quantity',
       )
-      .addSelect('category.name', 'category')
+      .addSelect('category.name', 'categoryName')
       .where('"userId" = :id', { id: userId })
       .getRawMany();
 
